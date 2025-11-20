@@ -45,7 +45,7 @@ export function useEspOperations() {
     return res;
   };
 
-  const flashEnglishFirmware = async () => {
+  const flashFirmware = async (version: Parameters<typeof getFirmware>[0]) => {
     setStepData([
       { name: 'Download firmware', status: 'pending' },
       { name: 'Connect to device', status: 'pending' },
@@ -55,7 +55,7 @@ export function useEspOperations() {
     ]);
 
     const firmwareFile = await wrapWithStep('Download firmware', () =>
-      getFirmware('3.0.8'),
+      getFirmware(version),
     );
 
     const espController = await wrapWithStep('Connect to device', async () => {
@@ -82,6 +82,9 @@ export function useEspOperations() {
 
     await wrapWithStep('Reset device', () => espController.disconnect());
   };
+
+  const flashEnglishFirmware = async () => flashFirmware('3.0.8-EN');
+  const flashChineseFirmware = async () => flashFirmware('3.0.7-CH');
 
   const saveFullFlash = async () => {
     setStepData([
@@ -204,6 +207,7 @@ export function useEspOperations() {
     isRunning,
     actions: {
       flashEnglishFirmware: wrapWithRunning(flashEnglishFirmware),
+      flashChineseFirmware: wrapWithRunning(flashChineseFirmware),
       saveFullFlash: wrapWithRunning(saveFullFlash),
       writeFullFlash: wrapWithRunning(writeFullFlash),
       debugSteps2: wrapWithRunning(debugSteps2),

@@ -141,6 +141,13 @@ export default function Home() {
             >
               Flash English firmware (3.0.8)
             </Button>
+            <Button
+              variant="subtle"
+              onClick={actions.flashChineseFirmware}
+              disabled={isRunning}
+            >
+              Flash Chinese firmware (3.0.7)
+            </Button>
             {process.env.NODE_ENV === 'development' && (
               <Button
                 variant="subtle"
