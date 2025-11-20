@@ -97,7 +97,7 @@ export function useEspOperations() {
     });
 
     const firmwareFile = await wrapWithStep('Read flash', () =>
-      espController.readFullFlash((_, p, t) =>
+      espController.readFullFlashInChunks((_, p, t) =>
         updateStepData('Read flash', { progress: { current: p, total: t } }),
       ),
     );
