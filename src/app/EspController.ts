@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { ESPLoader, Transport } from "esptool-js";
+import { ESPLoader, Transport } from 'esptool-js';
 
 export default class EspController {
   static async requestDevice() {
-    if (!("serial" in navigator && navigator.serial)) {
-      throw new Error("WebSerial is not supported in this browser");
+    if (!('serial' in navigator && navigator.serial)) {
+      throw new Error('WebSerial is not supported in this browser');
     }
 
-    return await navigator.serial.requestPort({
+    return navigator.serial.requestPort({
       filters: [{ usbVendorId: 12346, usbProductId: 4097 }],
     });
   }
@@ -58,7 +58,7 @@ export default class EspController {
   ) {
     if (data.length !== 0x1000000) {
       throw new Error(
-        `Data length must be 0x1000000, but got 0x${data.length.toString().padStart(7, "0")}`,
+        `Data length must be 0x1000000, but got 0x${data.length.toString().padStart(7, '0')}`,
       );
     }
 
@@ -75,7 +75,7 @@ export default class EspController {
   ) {
     if (data.length !== 0x2000) {
       throw new Error(
-        `Data length must be 0x2000, but got 0x${data.length.toString().padStart(4, "0")}`,
+        `Data length must be 0x2000, but got 0x${data.length.toString().padStart(4, '0')}`,
       );
     }
 
@@ -90,7 +90,7 @@ export default class EspController {
     ) => void,
   ) {
     const u8Array = new Uint8Array(0x2000);
-    for (let i = 0; i < 0x2000; i++) {
+    for (let i = 0; i < 0x2000; i += 1) {
       u8Array[i] = 255;
     }
 
@@ -133,9 +133,9 @@ export default class EspController {
           address,
         },
       ],
-      flashSize: "keep",
-      flashMode: "keep",
-      flashFreq: "keep",
+      flashSize: 'keep',
+      flashMode: 'keep',
+      flashFreq: 'keep',
 
       eraseAll: false,
       compress: true,

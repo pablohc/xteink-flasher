@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import EspController from "@/app/EspController";
-import Step from "@/components/Step/Step";
-
-import styles from "./page.module.css";
-import { getFirmware } from "@/app/firmwareFetcher";
+import React, { useRef, useState } from 'react';
+import EspController from '@/app/EspController';
+import Step from '@/components/Step/Step';
+import { getFirmware } from '@/app/firmwareFetcher';
+import styles from './page.module.css';
 
 const downloadData = (data: Uint8Array, fileName: string, mimeType: string) => {
   // @ts-expect-error types say no, but browser says yes
@@ -14,25 +13,23 @@ const downloadData = (data: Uint8Array, fileName: string, mimeType: string) => {
   });
   const url = window.URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = fileName;
-  a.style = "display: none";
+  a.style = 'display: none';
   document.body.appendChild(a);
   a.click();
   a.remove();
 
-  setTimeout(function () {
-    return window.URL.revokeObjectURL(url);
-  }, 1000);
+  setTimeout(() => window.URL.revokeObjectURL(url), 1000);
 };
 
-type StepData = Array<{
+type StepData = {
   name: string;
-  status: "pending" | "running" | "success" | "failed";
+  status: 'pending' | 'running' | 'success' | 'failed';
   progress: number;
   errorMessage?: string;
-}>;
+}[];
 
 export default function Home() {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -46,9 +43,8 @@ export default function Home() {
       oldStepData.map((oldData) => {
         if (oldData.name === step) {
           return { ...oldData, ...data };
-        } else {
-          return oldData;
         }
+        return oldData;
       }),
     );
   };
@@ -57,164 +53,164 @@ export default function Home() {
   const flashEnglishFirmware = async () => {
     clearSteps();
 
-    appendStep({ name: "Connect device", status: "running", progress: -1 });
+    appendStep({ name: 'Connect device', status: 'running', progress: -1 });
     const espController = await EspController.fromRequestedDevice().catch(
       (e) => {
-        updateStepData("Connect device", {
-          status: "failed",
+        updateStepData('Connect device', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       },
     );
     await espController.connect().catch((e) => {
-      updateStepData("Connect device", {
-        status: "failed",
+      updateStepData('Connect device', {
+        status: 'failed',
         errorMessage: e.toString(),
       });
       throw e;
     });
-    updateStepData("Connect device", { status: "success" });
+    updateStepData('Connect device', { status: 'success' });
 
-    appendStep({ name: "Download firmware", status: "running", progress: -1 });
-    const firmwareFile = await getFirmware("3.0.8").catch((e) => {
-      updateStepData("Download firmware", {
-        status: "failed",
+    appendStep({ name: 'Download firmware', status: 'running', progress: -1 });
+    const firmwareFile = await getFirmware('3.0.8').catch((e) => {
+      updateStepData('Download firmware', {
+        status: 'failed',
         errorMessage: e.toString(),
       });
       throw e;
     });
-    updateStepData("Download firmware", { status: "success" });
+    updateStepData('Download firmware', { status: 'success' });
 
-    appendStep({ name: "Flash OTA partition", status: "running", progress: 0 });
+    appendStep({ name: 'Flash OTA partition', status: 'running', progress: 0 });
     await espController
       .writeEmptyOtaPartition((_, p, t) =>
-        updateStepData("Flash OTA partition", { progress: p / t }),
+        updateStepData('Flash OTA partition', { progress: p / t }),
       )
       .catch((e) => {
-        updateStepData("Flash OTA partition", {
-          status: "failed",
+        updateStepData('Flash OTA partition', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       });
-    updateStepData("Flash OTA partition", { status: "success" });
+    updateStepData('Flash OTA partition', { status: 'success' });
 
     appendStep({
-      name: "Flash OTA_0 partition",
-      status: "running",
+      name: 'Flash OTA_0 partition',
+      status: 'running',
       progress: 0,
     });
     await espController
       .writeOta0(firmwareFile, (_, p, t) =>
-        updateStepData("Flash OTA_0 partition", { progress: p / t }),
+        updateStepData('Flash OTA_0 partition', { progress: p / t }),
       )
       .catch((e) => {
-        updateStepData("Flash OTA_0 partition", {
-          status: "failed",
+        updateStepData('Flash OTA_0 partition', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       });
-    updateStepData("Flash OTA_0 partition", { status: "success" });
+    updateStepData('Flash OTA_0 partition', { status: 'success' });
 
-    appendStep({ name: "Reset device", status: "running", progress: -0 });
+    appendStep({ name: 'Reset device', status: 'running', progress: -0 });
     await espController.disconnect().catch((e) => {
-      updateStepData("Reset device", {
-        status: "failed",
+      updateStepData('Reset device', {
+        status: 'failed',
         errorMessage: e.toString(),
       });
       throw e;
     });
-    updateStepData("Reset device", { status: "success" });
+    updateStepData('Reset device', { status: 'success' });
   };
 
   const saveFullFlash = async () => {
     clearSteps();
 
-    appendStep({ name: "Connect device", status: "running", progress: -1 });
+    appendStep({ name: 'Connect device', status: 'running', progress: -1 });
     const espController = await EspController.fromRequestedDevice().catch(
       (e) => {
-        updateStepData("Connect device", {
-          status: "failed",
+        updateStepData('Connect device', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       },
     );
     await espController.connect().catch((e) => {
-      updateStepData("Connect device", {
-        status: "failed",
+      updateStepData('Connect device', {
+        status: 'failed',
         errorMessage: e.toString(),
       });
       throw e;
     });
-    updateStepData("Connect device", { status: "success" });
+    updateStepData('Connect device', { status: 'success' });
 
-    appendStep({ name: "Read flash", status: "running", progress: 0 });
+    appendStep({ name: 'Read flash', status: 'running', progress: 0 });
     const firmwareFile = await espController
       .readFullFlash((_, p, t) =>
-        updateStepData("Read flash", { progress: p / t }),
+        updateStepData('Read flash', { progress: p / t }),
       )
       .catch((e) => {
-        updateStepData("Read flash", {
-          status: "failed",
+        updateStepData('Read flash', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       });
-    updateStepData("Read flash", { status: "success" });
+    updateStepData('Read flash', { status: 'success' });
 
-    downloadData(firmwareFile, "flash.bin", "application/octet-stream");
+    downloadData(firmwareFile, 'flash.bin', 'application/octet-stream');
   };
 
   const writeFullFlash = async () => {
     clearSteps();
 
-    appendStep({ name: "Read file", status: "running", progress: -1 });
+    appendStep({ name: 'Read file', status: 'running', progress: -1 });
     const file = fileInput.current?.files?.[0];
     if (!file) {
-      updateStepData("Read file", {
-        status: "failed",
-        errorMessage: "File could not be found",
+      updateStepData('Read file', {
+        status: 'failed',
+        errorMessage: 'File could not be found',
       });
       return;
     }
     const fileData = new Uint8Array(await file.arrayBuffer());
-    updateStepData("Read file", { status: "success" });
+    updateStepData('Read file', { status: 'success' });
 
-    appendStep({ name: "Connect device", status: "running", progress: -1 });
+    appendStep({ name: 'Connect device', status: 'running', progress: -1 });
     const espController = await EspController.fromRequestedDevice().catch(
       (e) => {
-        updateStepData("Connect device", {
-          status: "failed",
+        updateStepData('Connect device', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       },
     );
     await espController.connect().catch((e) => {
-      updateStepData("Connect device", {
-        status: "failed",
+      updateStepData('Connect device', {
+        status: 'failed',
         errorMessage: e.toString(),
       });
       throw e;
     });
-    updateStepData("Connect device", { status: "success" });
+    updateStepData('Connect device', { status: 'success' });
 
-    appendStep({ name: "Write flash", status: "running", progress: 0 });
+    appendStep({ name: 'Write flash', status: 'running', progress: 0 });
     await espController
       .writeFullFlash(fileData, (_, p, t) =>
-        updateStepData("Write flash", { progress: p / t }),
+        updateStepData('Write flash', { progress: p / t }),
       )
       .catch((e) => {
-        updateStepData("Write flash", {
-          status: "failed",
+        updateStepData('Write flash', {
+          status: 'failed',
           errorMessage: e.toString(),
         });
         throw e;
       });
-    updateStepData("Write flash", { status: "success" });
+    updateStepData('Write flash', { status: 'success' });
   };
 
   return (
@@ -222,17 +218,23 @@ export default function Home() {
       <h1>Xteink English Firmware Flasher</h1>
       <section className={styles.section}>
         <h2>Full flash controls</h2>
-        <button onClick={saveFullFlash}>Save full flash</button>
-        <div style={{ display: "flex" }}>
+        <button type="button" onClick={saveFullFlash}>
+          Save full flash
+        </button>
+        <div style={{ display: 'flex' }}>
           <input ref={fileInput} type="file" />
-          <button style={{ flexGrow: 1 }} onClick={writeFullFlash}>
+          <button
+            type="button"
+            style={{ flexGrow: 1 }}
+            onClick={writeFullFlash}
+          >
             Write full flash from file
           </button>
         </div>
       </section>
       <section className={styles.section}>
         <h2>OTA fast flash controls</h2>
-        <button onClick={flashEnglishFirmware}>
+        <button type="button" onClick={flashEnglishFirmware}>
           Flash English firmware (3.0.8) via OTA
         </button>
       </section>
