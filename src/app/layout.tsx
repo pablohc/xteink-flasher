@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import './globals.css';
 import { Provider } from '@/components/ui/provider';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Xteink Flash Tools',
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <Toaster />
+        </Provider>
       </body>
     </html>
   );
