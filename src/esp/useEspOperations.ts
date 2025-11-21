@@ -47,22 +47,22 @@ export function useEspOperations() {
 
   const flashFirmware = async (version: Parameters<typeof getFirmware>[0]) => {
     setStepData([
-      { name: 'Download firmware', status: 'pending' },
       { name: 'Connect to device', status: 'pending' },
+      { name: 'Download firmware', status: 'pending' },
       { name: 'Flash OTA partition', status: 'pending' },
       { name: 'Flash OTA_0 partition', status: 'pending' },
       { name: 'Reset device', status: 'pending' },
     ]);
-
-    const firmwareFile = await wrapWithStep('Download firmware', () =>
-      getFirmware(version),
-    );
 
     const espController = await wrapWithStep('Connect to device', async () => {
       const c = await EspController.fromRequestedDevice();
       await c.connect();
       return c;
     });
+
+    const firmwareFile = await wrapWithStep('Download firmware', () =>
+      getFirmware(version),
+    );
 
     await wrapWithStep('Flash OTA partition', () =>
       espController.writeEmptyOtaPartition((_, p, t) =>
