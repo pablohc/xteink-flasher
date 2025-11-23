@@ -2761,6 +2761,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"classnames@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
+  languageName: node
+  linkType: hard
+
 "client-only@npm:0.0.1":
   version: 0.0.1
   resolution: "client-only@npm:0.0.1"
@@ -4919,6 +4926,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-window@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "react-window@npm:2.2.3"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/7e97381b269560038c4c76c4ae17121d87efb628fce840fe382e73ae0e9816d4b68384a402340b0a08f9e4a47d8bd7328ae8502fd26b0d9399339a20e1c550be
+  languageName: node
+  linkType: hard
+
 "react@npm:^19.2.0":
   version: 19.2.0
   resolution: "react@npm:19.2.0"
@@ -5807,6 +5824,7 @@ __metadata:
     "@types/react": "npm:^19.2.6"
     "@types/react-dom": "npm:^19.2.3"
     babel-plugin-react-compiler: "npm:^1.0.0"
+    classnames: "npm:^2.5.1"
     crc: "npm:^4.3.2"
     eslint: "npm:^9.39.1"
     eslint-config-airbnb-extended: "npm:^2.3.2"
@@ -5825,6 +5843,7 @@ __metadata:
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-icons: "npm:^5.5.0"
+    react-window: "npm:^2.2.3"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.47.0"
   languageName: unknown

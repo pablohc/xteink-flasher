@@ -5,10 +5,13 @@ import {
   Alert,
   Button,
   Card,
+  CloseButton,
+  Dialog,
   Em,
   Flex,
   Heading,
   Mark,
+  Portal,
   Separator,
   Stack,
   Table,
@@ -18,19 +21,17 @@ import Steps from '@/components/Steps';
 import { OtaPartitionState } from '@/esp/OtaPartitionState';
 import OtaPartition, { OtaPartitionDetails } from '@/esp/OtaPartition';
 import HexSpan from '@/components/HexSpan';
+import HexViewer from '@/components/HexViewer';
+import { downloadData } from '@/utils/download';
 
-function OtadataDebug({
-  partitions,
-  bootPartitionLabel,
-}: {
-  partitions: OtaPartitionDetails[];
-  bootPartitionLabel: string;
-}) {
+function OtadataDebug({ otaPartition }: { otaPartition: OtaPartition }) {
+  const bootPartitionLabel = otaPartition.getCurrentBootPartitionLabel();
+
   return (
     <Stack>
       <Heading size="lg">OTA data</Heading>
       <Stack direction="row">
-        {partitions.map((partition) => (
+        {otaPartition.otaAppPartitions().map((partition) => (
           <Card.Root
             variant="subtle"
             size="sm"
@@ -111,6 +112,86 @@ function OtadataDebug({
           </Card.Root>
         ))}
       </Stack>
+      <Dialog.Root size="xl" modal>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">View Raw Data</Button>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Raw Data</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>
+                <HexViewer data={otaPartition.data} />
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+      <Button
+        variant="outline"
+        onClick={() =>
+          downloadData(
+            otaPartition.data,
+            'otadata.bin',
+            'application/octet-stream',
+          )
+        }
+      >
+        Download Raw Data
+      </Button>
+    </Stack>
+  );
+}
+
+function AppDebug({
+  appPartitionData,
+  partitionLabel,
+}: {
+  appPartitionData: Uint8Array;
+  partitionLabel: OtaPartitionDetails['partitionLabel'];
+}) {
+  return (
+    <Stack>
+      <Heading size="lg">App partition data ({partitionLabel})</Heading>
+      <Dialog.Root size="xl" modal>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">View Raw Data</Button>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Raw Data</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+              <Dialog.Body>
+                <HexViewer data={appPartitionData} />
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+      <Button
+        variant="outline"
+        onClick={() =>
+          downloadData(
+            appPartitionData,
+            `${partitionLabel}.bin`,
+            'application/octet-stream',
+          )
+        }
+      >
+        Download Raw Data
+      </Button>
     </Stack>
   );
 }
@@ -118,17 +199,6 @@ function OtadataDebug({
 export default function Debug() {
   const { debugActions, stepData, isRunning } = useEspOperations();
   const [debugOutputNode, setDebugOutputNode] = useState<ReactNode>(null);
-
-  const runOtadataActionWithOutput =
-    (fn: () => Promise<OtaPartition>) => async () => {
-      const data = await fn();
-      setDebugOutputNode(
-        <OtadataDebug
-          partitions={data.otaAppPartitions()}
-          bootPartitionLabel={data.getCurrentBootPartitionLabel()}
-        />,
-      );
-    };
 
   return (
     <Flex direction="column" gap="20px">
@@ -142,8 +212,14 @@ export default function Debug() {
               intentionally messing around with their device.
             </p>
             <p>
-              <b>Read otadata partition</b> will read and show the details held
-              in the <Em>otadata</Em> partition.
+              <b>Read otadata partition</b> will read the raw data out of the{' '}
+              <Em>otadata</Em> partition and allow you to inspect or download
+              the contents.
+            </p>
+            <p>
+              <b>Read app partition</b> will read the raw data out of the
+              selected app partition and allow you to inspect or download the
+              contents.
             </p>
             <p>
               <b>Swap boot partitions</b> will check the current boot partition
@@ -155,14 +231,56 @@ export default function Debug() {
         <Stack as="section">
           <Button
             variant="subtle"
-            onClick={runOtadataActionWithOutput(debugActions.readDebugOtadata)}
+            onClick={() => {
+              debugActions
+                .readDebugOtadata()
+                .then((data) =>
+                  setDebugOutputNode(<OtadataDebug otaPartition={data} />),
+                );
+            }}
             disabled={isRunning}
           >
             Read otadata partition
           </Button>
           <Button
             variant="subtle"
-            onClick={runOtadataActionWithOutput(debugActions.swapBootPartition)}
+            onClick={() => {
+              debugActions
+                .readAppPartition('app0')
+                .then((data) =>
+                  setDebugOutputNode(
+                    <AppDebug appPartitionData={data} partitionLabel="app0" />,
+                  ),
+                );
+            }}
+            disabled={isRunning}
+          >
+            Read app0 partition
+          </Button>
+          <Button
+            variant="subtle"
+            onClick={() => {
+              debugActions
+                .readAppPartition('app1')
+                .then((data) =>
+                  setDebugOutputNode(
+                    <AppDebug appPartitionData={data} partitionLabel="app1" />,
+                  ),
+                );
+            }}
+            disabled={isRunning}
+          >
+            Read app1 partition
+          </Button>
+          <Button
+            variant="subtle"
+            onClick={() => {
+              debugActions
+                .swapBootPartition()
+                .then((data) =>
+                  setDebugOutputNode(<OtadataDebug otaPartition={data} />),
+                );
+            }}
             disabled={isRunning}
           >
             Swap boot partitions (app0 / app1)
