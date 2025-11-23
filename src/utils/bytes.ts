@@ -3,9 +3,9 @@
 export function u32ToLeBytes(u32: number) {
   return new Uint8Array([
     u32 & 0xff,
-    (u32 >> 8) & 0xff,
-    (u32 >> 16) & 0xff,
-    (u32 >> 24) & 0xff,
+    (u32 >>> 8) & 0xff,
+    (u32 >>> 16) & 0xff,
+    (u32 >>> 24) & 0xff,
   ]);
 }
 
