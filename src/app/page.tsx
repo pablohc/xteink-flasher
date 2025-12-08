@@ -116,14 +116,14 @@ export default function Home() {
             onClick={actions.flashEnglishFirmware}
             disabled={isRunning}
           >
-            Flash English firmware (3.1.0)
+            Flash English firmware (3.1.1)
           </Button>
           <Button
             variant="subtle"
             onClick={actions.flashChineseFirmware}
             disabled={isRunning}
           >
-            Flash Chinese firmware (3.0.8)
+            Flash Chinese firmware (3.1.1)
           </Button>
           <Stack direction="row">
             <Flex grow={1}>

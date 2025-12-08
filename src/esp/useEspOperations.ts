@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getFirmware } from '@/remote/firmwareFetcher';
+import { getOfficialFirmware } from '@/remote/firmwareFetcher';
 import { downloadData } from '@/utils/download';
 import { wrapWithWakeLock } from '@/utils/wakelock';
 import OtaPartition, { OtaPartitionDetails } from './OtaPartition';
@@ -21,7 +21,7 @@ export function useEspOperations() {
     };
 
   const flashRemoteFirmware = async (
-    version: Parameters<typeof getFirmware>[0],
+    getFirmware: () => Promise<Uint8Array>,
   ) => {
     initializeSteps([
       'Connect to device',
@@ -38,9 +38,7 @@ export function useEspOperations() {
       return c;
     });
 
-    const firmwareFile = await runStep('Download firmware', () =>
-      getFirmware(version),
-    );
+    const firmwareFile = await runStep('Download firmware', getFirmware);
 
     const [otaPartition, backupPartitionLabel] = await runStep(
       'Read otadata partition',
@@ -83,8 +81,10 @@ export function useEspOperations() {
     await runStep('Reset device', () => espController.disconnect());
   };
 
-  const flashEnglishFirmware = async () => flashRemoteFirmware('3.1.0-EN');
-  const flashChineseFirmware = async () => flashRemoteFirmware('3.0.8-CH');
+  const flashEnglishFirmware = async () =>
+    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-EN'));
+  const flashChineseFirmware = async () =>
+    flashRemoteFirmware(() => getOfficialFirmware('3.1.1-CH'));
 
   const flashCustomFirmware = async (getFile: () => File | undefined) => {
     initializeSteps([
